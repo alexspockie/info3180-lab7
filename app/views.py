@@ -6,8 +6,10 @@ This file creates your application.
 """
 
 from app import app
-from forms import UploadForm
+from app.forms import UploadForm
 from flask import render_template, request, jsonify, send_file
+from flask_wtf.csrf import generate_csrf
+from werkzeug.utils import secure_filename
 import os
 
 
@@ -31,13 +33,16 @@ def upload():
         photo.save(os.path.join(
           app.config['UPLOAD_FOLDER'], filename
         ))
-        flash('File Saved', 'success')
+        #flash('File Saved', 'success')
         obj={"message":"File Upload Successful", "filename": filename, "description": desc}
         return jsonify(obj)
 
     else:
         return jsonify(form_errors(myform))
 
+@app.route('/api/csrf-token', methods=['GET'])
+def get_csrf():
+    return jsonify({'csrf_token':generate_csrf()})
 
 ###
 # The functions below should be applicable to all Flask apps.
